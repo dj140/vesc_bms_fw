@@ -45,13 +45,30 @@
 #define HW_NO_CH0_TEST
 
 // HW-specific
-#define HW_INIT_HOOK()			palSetLineMode(LINE_CAN_EN, PAL_MODE_OUTPUT_PUSHPULL); \
-								palSetLineMode(LINE_CURR_MEASURE_EN, PAL_MODE_OUTPUT_PUSHPULL)
+#define HW_INIT_HOOK()			hw_board_init();\
+                                palSetLineMode(LINE_CAN_EN, PAL_MODE_OUTPUT_PUSHPULL); \
+								palSetLineMode(LINE_CURR_MEASURE_EN, PAL_MODE_OUTPUT_PUSHPULL);\
+                                palSetPadMode(HW_SHUTDOWN_SENSE_GPIO, HW_SHUTDOWN_SENSE_PIN, PAL_MODE_INPUT_PULLUP)
+
 
 #define HW_CAN_ON()				palClearLine(LINE_CAN_EN)
 #define HW_CAN_OFF()			palSetLine(LINE_CAN_EN)
 #define CURR_MEASURE_ON()		palClearLine(LINE_CURR_MEASURE_EN)
 #define CURR_MEASURE_OFF()		palSetLine(LINE_CURR_MEASURE_EN)
+#define HW_STAY_AWAKE_HOOK()	hw_stay_awake()
+
+// Shutdown pin
+#define HW_SHUTDOWN_GPIO		 GPIOC
+#define HW_SHUTDOWN_PIN			 4
+#define HW_SHUTDOWN_SENSE_GPIO	 GPIOC
+#define HW_SHUTDOWN_SENSE_PIN	 5
+#define HW_SHUTDOWN_HOLD_ON()	palSetPad(HW_SHUTDOWN_GPIO, HW_SHUTDOWN_PIN)
+#define HW_SHUTDOWN_HOLD_OFF()	palClearPad(HW_SHUTDOWN_GPIO, HW_SHUTDOWN_PIN)
+#define HW_SAMPLE_SHUTDOWN()	hw_sample_shutdown_button()
+
+// Hold shutdown pin early to wake up on short pulses
+#define HW_EARLY_INIT()			palSetPadMode(HW_SHUTDOWN_GPIO, HW_SHUTDOWN_PIN, PAL_MODE_OUTPUT_PUSHPULL); \
+								HW_SHUTDOWN_HOLD_ON(); 
 
 // Macros
 #define CHARGE_ENABLE()			BQ_CHG_ON(); BQ_DSG_ON()
@@ -67,17 +84,18 @@
 #define HW_SHUNT_AMP_GAIN		(50.0)
 #endif
 #define V_REG					3.3
-#define R_CHARGE_TOP			(316e3 + 2.5e3 + 100.0)
-#define R_CHARGE_BOTTOM			(10e3)
+#define R_CHARGE_TOP			(56e3 + 2.5e3 + 100.0)
+#define R_CHARGE_BOTTOM			(2.2e3)
 
 // LEDs
 #if defined(HW_18S_LIGHT_MK2) || defined(HW_18S_LIGHT_LMP)
-#define LINE_LED_RED			PAL_LINE(GPIOA, 9)
-#define LINE_LED_GREEN			PAL_LINE(GPIOA, 10)
+#define LINE_LED_RED			PAL_LINE(GPIOC, 10)
+#define LINE_LED_GREEN			PAL_LINE(GPIOC, 11)
 #else
 #define LINE_LED_RED			PAL_LINE(GPIOA, 0)
 #define LINE_LED_GREEN			PAL_LINE(GPIOA, 2)
 #endif
+#define LINE_LED_BLUE			PAL_LINE(GPIOC, 7) 
 
 // BQ76200
 #define LINE_BQ_CHG_EN			PAL_LINE(GPIOB, 0)
@@ -108,9 +126,23 @@
 #define BUZZER_ON()				pwmEnableChannel(&BUZZER_PWM, 3, PWM_PERCENTAGE_TO_WIDTH(&BUZZER_PWM, 5000))
 #define BUZZER_OFF()			pwmEnableChannel(&BUZZER_PWM, 3, PWM_PERCENTAGE_TO_WIDTH(&BUZZER_PWM, 0))
 
+// UART
+#define LINE_UART_RX			PAL_LINE(GPIOA, 10)
+#define LINE_UART_TX			PAL_LINE(GPIOA, 9)
+#define HW_UART_DEV				SD1
+#define HW_UART_AF				7
+#define CONF_UART_BAUD_RATE		115200
+
+// NRF SWD
+#define NRF5x_SWDIO_GPIO		GPIOB
+#define NRF5x_SWDIO_PIN			14
+#define NRF5x_SWCLK_GPIO		GPIOB
+#define NRF5x_SWCLK_PIN			15
+
 // Analog
 #define LINE_V_CHARGE			PAL_LINE(GPIOC, 2)
 #define LINE_CURRENT			PAL_LINE(GPIOC, 3)
+
 #define LINE_TEMP_0				PAL_LINE(GPIOC, 1)
 #if defined(HW_18S_LIGHT_MK2) || defined(HW_18S_LIGHT_LMP)
 #define LINE_TEMP_1				PAL_LINE(GPIOA, 0)
@@ -164,5 +196,8 @@
 #ifndef CONF_I_MEASURE_MODE
 #define CONF_I_MEASURE_MODE		I_MEASURE_MODE_VESC
 #endif
+
+void hw_board_init(void);
+bool hw_sample_shutdown_button(void);
 
 #endif /* HWCONF_HW_18S_LIGHT_H_ */

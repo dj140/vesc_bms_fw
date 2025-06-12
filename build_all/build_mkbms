@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+FWPATH="../"
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+################## HW 18s_light_lmp #######################
+
+COPYDIR=18s_light_lmp
+rm -f $COPYDIR/*
+mkdir -p $COPYDIR
+
+# default
+cd $FWPATH
+touch conf_general.h
+make -j8 build_args='-DHW_SOURCE=\"hw_18s_light.c\" -DHW_HEADER=\"hw_18s_light.h\" -DHW_18S_LIGHT_LMP' USE_VERBOSE_COMPILE=no
+cd $DIR
+cp $FWPATH/build/vesc_bms.bin $COPYDIR/vesc_default.bin
+
+# Clean
+cd $FWPATH
+make clean
+cd $DIR
+

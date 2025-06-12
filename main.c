@@ -55,7 +55,7 @@ __attribute__((section(".ram4"))) volatile backup_data backup;
 int main(void) {
 	halInit();
 	chSysInit();
-
+	HW_EARLY_INIT();
 	// Stop debug mode in case no power cycle has been done after upload. This
 	// saves power.
 	DBGMCU->CR = DBGMCU_CR_DBG_STOP;

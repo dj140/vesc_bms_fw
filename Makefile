@@ -159,6 +159,7 @@ CSRC = $(ALLCSRC) \
        comm_can.c \
        crc.c \
        hwconf/hw.c \
+       hwconf/shutdown.c \
        buffer.c \
        comm_usb.c \
        commands.c \

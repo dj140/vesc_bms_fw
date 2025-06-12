@@ -79,6 +79,10 @@
 #define HW_INIT_HOOK()
 #endif
 
+#ifndef HW_EARLY_INIT
+#define HW_EARLY_INIT()
+#endif
+
 #ifndef HW_SLEEP_HOOK
 #define HW_SLEEP_HOOK()
 #endif
