@@ -24,7 +24,7 @@
 #include "main.h"
 
 // Private variables
-static volatile int m_sleep_timer = 200;
+static volatile int m_sleep_timer = 240000;
 
 // Private functions
 static void go_to_sleep(void);
@@ -39,7 +39,6 @@ void sleep_init(void) {
 
 void sleep_reset(void) {
 	m_sleep_timer = backup.config.sleep_timeout_reset_ms;
-	HW_STAY_AWAKE_HOOK();
 }
 
 int sleep_time_left(void) {

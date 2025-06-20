@@ -95,7 +95,7 @@ void hw_board_init(void) {
 
 void hw_stay_awake(void) {
 
-    // palSetPad(HW_SHUTDOWN_GPIO, HW_SHUTDOWN_PIN);
+    palSetPad(HW_SHUTDOWN_GPIO, HW_SHUTDOWN_PIN);
 }
 
 #define RISING_EDGE_THRESHOLD 0.5
@@ -167,6 +167,9 @@ bool hw_sample_shutdown_button(void) {
         if (bt_hold_counter  > TIME_3S) {
             will_poweroff = true;
             bt_hold_counter = 0;
+            BUZZER_ON();
+            chThdSleepMilliseconds(100);
+            BUZZER_OFF();
             return true;
         }
 

@@ -115,6 +115,9 @@ static THD_FUNCTION(shutdown_thread, arg) {
 		if (m_button_pressed) {
 			gates_disabled_here = do_shutdown(true);
 		}
+		else{
+			HW_STAY_AWAKE_HOOK();
+		}
 
 
 		chThdSleepMilliseconds(10);

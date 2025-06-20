@@ -79,7 +79,7 @@
 #define HW_MAX_BAL_CH			10
 #define HW_SHUNT_RES			(1.0e-3)
 #if defined(HW_18S_LIGHT_LMP)
-#define HW_SHUNT_AMP_GAIN		(20.0)
+#define HW_SHUNT_AMP_GAIN		(50.0)
 #else
 #define HW_SHUNT_AMP_GAIN		(50.0)
 #endif

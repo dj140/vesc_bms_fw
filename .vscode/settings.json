@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "conf_general.h": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "bms_if.h": "c"
     }
 }
