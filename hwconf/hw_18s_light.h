@@ -77,15 +77,15 @@
 // Settings
 #define HW_CELLS_SERIES			18
 #define HW_MAX_BAL_CH			10
-#define HW_SHUNT_RES			(1.0e-3)
+#define HW_SHUNT_RES			(0.5e-3)
 #if defined(HW_18S_LIGHT_LMP)
-#define HW_SHUNT_AMP_GAIN		(50.0)
+#define HW_SHUNT_AMP_GAIN		(20.0)
 #else
 #define HW_SHUNT_AMP_GAIN		(50.0)
 #endif
 #define V_REG					3.3
-#define R_CHARGE_TOP			(56e3 + 2.5e3 + 100.0)
-#define R_CHARGE_BOTTOM			(2.2e3)
+#define R_CHARGE_TOP			(56e3)
+#define R_CHARGE_BOTTOM			(2.2e3 + 15.0)
 
 // LEDs
 #if defined(HW_18S_LIGHT_MK2) || defined(HW_18S_LIGHT_LMP)
@@ -101,7 +101,7 @@
 #define LINE_BQ_CHG_EN			PAL_LINE(GPIOB, 0)
 #define LINE_BQ_CP_EN			PAL_LINE(GPIOB, 1)
 #define LINE_BQ_DSG_EN			PAL_LINE(GPIOB, 2)
-#define LINE_BQ_PMON_EN			PAL_LINE(GPIOB, 11)
+#define LINE_BQ_PMON_EN			PAL_LINE(GPIOB, 10)
 #define LINE_BQ_PCHG_EN			PAL_LINE(GPIOB, 3)
 
 // LTC6813
@@ -138,6 +138,12 @@
 #define NRF5x_SWDIO_PIN			14
 #define NRF5x_SWCLK_GPIO		GPIOB
 #define NRF5x_SWCLK_PIN			15
+
+// HDC1080 (temp/humidity)
+#define HDC1080_SDA_GPIO		GPIOB
+#define HDC1080_SDA_PIN			12
+#define HDC1080_SCL_GPIO		GPIOB
+#define HDC1080_SCL_PIN			11
 
 // Analog
 #define LINE_V_CHARGE			PAL_LINE(GPIOC, 2)

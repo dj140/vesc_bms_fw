@@ -32,6 +32,7 @@ float bms_if_get_i_in_ic(void);
 float bms_if_get_v_cell(int cell);
 float bms_if_get_v_cell_min(void);
 float bms_if_get_v_cell_max(void);
+float bms_if_get_v_cell_max_diff(void);
 float bms_if_get_v_tot(void);
 float bms_if_get_v_charge(void);
 float bms_if_get_temp(int sensor);

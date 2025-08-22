@@ -29,6 +29,7 @@
 static volatile float m_v_charge = 0.0;
 static volatile float m_v_fuse = 0.0;
 static volatile float m_i_in = 0.0;
+static volatile float i_in_adc = 0.0;
 static volatile float m_temps[HW_ADC_TEMP_SENSORS] = {0.0};
 static volatile float m_temp_volts[HW_ADC_TEMP_SENSORS] = {0.0};
 
@@ -150,7 +151,8 @@ static THD_FUNCTION(adc_thd, p) {
 		m_v_charge = (v_ch / (4095 / vdda)) * ((R_CHARGE_TOP + R_CHARGE_BOTTOM) / R_CHARGE_BOTTOM);
 #endif
 #ifdef ADC_CH_CURRENT
-		m_i_in = -((3.3 * ((i_in / 4095.0))) - 1.65) * (1.0 / HW_SHUNT_AMP_GAIN) * (1.0 / backup.config.ext_shunt_res);
+		m_i_in = -((3.3 * ((i_in / 4095.0)))+ backup.ic_i_sens_v_ofs - 1.65) * (1.0 / HW_SHUNT_AMP_GAIN) * (1.0 / backup.config.ext_shunt_res);
+		i_in_adc = 3.3 * (i_in / 4095.0)- 1.65;
 #endif
 #ifdef ADC_CH_V_FUSE
 		m_v_fuse = (v_fuse / (4095 / vdda)) * ((R_CHARGE_TOP + R_CHARGE_BOTTOM) / R_CHARGE_BOTTOM);
@@ -217,7 +219,9 @@ void pwr_init(void) {
 #ifdef BUZZER_LINE
 	pwmStart(&BUZZER_PWM, &pwmcfg);
 	palSetLineMode(BUZZER_LINE, PAL_MODE_ALTERNATE(BUZZER_AF));
-	BUZZER_OFF();
+	// BUZZER_ON();
+	// chThdSleepMilliseconds(100);
+	// BUZZER_OFF();
 #endif
 
 	chThdSleepMilliseconds(10);
@@ -235,6 +239,10 @@ float pwr_get_vfuse(void) {
 
 float pwr_get_iin(void) {
 	return m_i_in;
+}
+
+float pwr_get_iin_adc(void) {
+	return i_in_adc;
 }
 
 float pwr_get_temp(int sensor) {

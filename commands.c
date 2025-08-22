@@ -309,7 +309,7 @@ void commands_process_packet(unsigned char *data, unsigned int len,
 		buffer_append_float32_auto(send_buffer_global, bms_if_get_wh_cnt_dis_total(), &ind);
 
 		// Pressure
-		buffer_append_float16(send_buffer_global, bms_if_get_humsens_pres_pcb(), 1e-1, &ind);
+		buffer_append_float16(send_buffer_global, bms_if_get_humsens_pres_pcb(), 1e4, &ind);
 
 		chMtxUnlock(&send_buffer_mutex);
 

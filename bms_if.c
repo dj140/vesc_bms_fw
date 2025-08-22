@@ -82,7 +82,6 @@ bool bms_if_charge_ok(void) {
 static THD_FUNCTION(charge_thd, p) {
 	(void)p;
 	chRegSetThreadName("Charge");
-
 	for (;;) {
 #ifdef ADC_CH_CURRENT
 		float chg_current = m_i_in_filter;
@@ -329,20 +328,21 @@ static THD_FUNCTION(if_thd, p) {
 		ltc_curr_adc = -ltc_curr_adc;
 #endif
 
-		float i_bms_ic = -(ltc_curr_adc + backup.ic_i_sens_v_ofs) *
-					(1.0 / HW_SHUNT_AMP_GAIN) * (1.0 / backup.config.ext_shunt_res) * IC_ISENSE_I_GAIN_CORR;
+		float i_bms_ic = -(pwr_get_iin_adc() + backup.ic_i_sens_v_ofs) *
+					(1.0 / HW_SHUNT_AMP_GAIN) * (1.0 / backup.config.ext_shunt_res);
 		float i_adc = pwr_get_iin();
-
-#ifdef LTC_GPIO_CURR_MON_2
-		if (ltc_last_gpio_voltage(LTC_GPIO_CURR_MON) <= 0.0 ||
-				ltc_last_gpio_voltage(LTC_GPIO_CURR_MON_2) < 0.0) {
-			i_bms_ic = 0.0;
-		}
-#else
-		if (ltc_last_gpio_voltage(LTC_GPIO_CURR_MON) <= 0.0) {
-			i_bms_ic = 0.0;
-		}
-#endif
+		// float i_bms_ic = pwr_get_iin();
+		
+// #ifdef LTC_GPIO_CURR_MON_2
+// 		if (ltc_last_gpio_voltage(LTC_GPIO_CURR_MON) <= 0.0 ||
+// 				ltc_last_gpio_voltage(LTC_GPIO_CURR_MON_2) < 0.0) {
+// 			i_bms_ic = 0.0;
+// 		}
+// #else
+// 		if (ltc_last_gpio_voltage(LTC_GPIO_CURR_MON) <= 0.0) {
+// 			i_bms_ic = 0.0;
+// 		}
+// #endif
 
 		if (backup.config.i_measure_mode == I_MEASURE_MODE_VESC) {
 			for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
@@ -438,6 +438,10 @@ float bms_if_get_v_cell_min(void) {
 
 float bms_if_get_v_cell_max(void) {
 	return m_voltage_cell_max;
+}
+
+float bms_if_get_v_cell_max_diff(void) {
+	return m_voltage_cell_max - m_voltage_cell_min;
 }
 
 float bms_if_get_v_tot(void) {
@@ -555,16 +559,16 @@ void bms_if_zero_current_offset(void) {
 	float samples = 0.0;
 
 	for (int i = 0;i < 20;i++) {
-		float ltc_curr_adc = ltc_last_gpio_voltage(LTC_GPIO_CURR_MON) - 1.65;
+		float ltc_curr_adc = pwr_get_iin_adc();
 #ifdef LTC_GPIO_CURR_MON_2
-		ltc_curr_adc += ltc_last_gpio_voltage(LTC_GPIO_CURR_MON_2) - 1.65;
+		ltc_curr_adc += pwr_get_iin_adc();
 #endif
 
 #ifdef LTC_INVERT_CURRENT
 		ltc_curr_adc = -ltc_curr_adc;
 #endif
 
-		ofs_avg -= ltc_curr_adc;
+		ofs_avg -= ltc_curr_adc; 
 		samples += 1.0;
 		chThdSleepMilliseconds(100);
 	}
@@ -605,7 +609,7 @@ float bms_if_get_humsens_pres_pcb(void) {
 #if defined(BME280_SDA_GPIO)
 	return bme280_if_get_pres();
 #else
-	return 0.0;
+	return bms_if_get_v_cell_max_diff();
 #endif
 }
 

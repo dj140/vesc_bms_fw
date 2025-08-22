@@ -75,7 +75,7 @@ bool do_shutdown(bool resample) {
 	chThdSleepMilliseconds(100);
 	if (resample) {
 		chMtxLock(&m_sample_mutex);
-		play_melody(MEL_JET_DISCONNECTED);
+		// play_melody(MEL_JET_DISCONNECTED);
 		HW_SHUTDOWN_HOLD_OFF();
 		chMtxUnlock(&m_sample_mutex);
 	}

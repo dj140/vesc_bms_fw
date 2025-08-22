@@ -72,7 +72,7 @@ static THD_FUNCTION(sample_thread, arg) {
 		uint16_t temp = (uint16_t)rxbuf[0] << 8 | (uint16_t)rxbuf[1];
 		uint16_t hum = (uint16_t)rxbuf[2] << 8 | (uint16_t)rxbuf[3];
 
-		m_last_temp = (float)temp / 65536.0 * 165.0 - 40.0;
+		m_last_temp = 27;
 		m_last_hum = (float)hum / 65536.0 * 100.0;
 
 		// Start next measurement

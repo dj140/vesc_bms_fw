@@ -39,6 +39,8 @@ static unsigned int bt_hold_counter = 0;
 
 // Private functions
 static void terminal_chg_en(int argc, const char **argv);
+static void terminal_current_en(int argc, const char **argv);
+static void terminal_can_en(int argc, const char **argv);
 static void terminal_dsg_en(int argc, const char **argv);
 static void terminal_buzzer_test(int argc, const char **argv);
 static void terminal_shutdown_now(int argc, const char **argv);
@@ -67,6 +69,18 @@ void hw_board_init(void) {
         "Enable discharge output",
         "[en]",
         terminal_dsg_en);
+
+    terminal_register_command_callback(
+        "current_en",
+        "Enable current measure",
+        "[en]",
+        terminal_current_en);
+
+    terminal_register_command_callback(
+        "can_en",
+        "Enable can Communication",
+        "[en]",
+        terminal_can_en);
 
 	terminal_register_command_callback(
         "buzzer_test",
@@ -157,7 +171,7 @@ bool hw_sample_shutdown_button(void) {
             BUZZER_OFF();
             return false;
         }
-        return true;
+        return false;
     }
 
     // we've had a rising edge and are now checking for a steady hold
@@ -239,9 +253,41 @@ static void terminal_dsg_en(int argc, const char **argv) {
 	commands_printf("Invalid arguments\n");
 }
 
+static void terminal_current_en(int argc, const char **argv) {
+	if (argc == 2) {
+		int en = -1;
+		sscanf(argv[1], "%d", &en);
+
+		if (en >= 0) {
+			palWriteLine(LINE_CURR_MEASURE_EN, en ? 1 : 0);
+			commands_printf("OK\n");
+			return;
+		}
+	}
+
+	commands_printf("Invalid arguments\n");
+}
+
+static void terminal_can_en(int argc, const char **argv) {
+	if (argc == 2) {
+		int en = -1;
+		sscanf(argv[1], "%d", &en);
+
+		if (en >= 0) {
+			palWriteLine(LINE_CAN_EN, en ? 1 : 0);
+			commands_printf("OK\n");
+			return;
+		}
+	}
+
+	commands_printf("Invalid arguments\n");
+}
 
 static void terminal_buzzer_test(int argc, const char **argv) {
-
+    
+    BUZZER_ON();
+    chThdSleepMilliseconds(100);
+    BUZZER_OFF();
 	for (size_t i = 1; i < (size_t)argc; i++) {
 		play_melody(argv[i]);
 	}
